@@ -1,7 +1,8 @@
-package com.example.cheesecakenews
+package com.example.cheesecakenews.view
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import com.example.cheesecakenews.R
 
 class MainActivity : AppCompatActivity() {
 
