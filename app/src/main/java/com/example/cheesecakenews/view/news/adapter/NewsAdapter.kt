@@ -20,6 +20,7 @@ class NewsAdapter(val clickListener: ((News) -> Unit)?) : RecyclerView.Adapter<N
         fun bind(newsItem: News, clickListener: ((News) -> Unit)?) {
             itemView.textViewTitle.text = newsItem.title
             itemView.textViewAuthors.text = newsItem.authors
+            itemView.textViewDate.text = newsItem.date
             itemView.setOnClickListener {
                 if (clickListener != null) {
                     clickListener(newsItem)
