@@ -1,5 +1,7 @@
 package com.example.cheesecakenews.model
 
+import com.google.gson.annotations.SerializedName
+
 data class News (
     val title: String,
     val website: String,

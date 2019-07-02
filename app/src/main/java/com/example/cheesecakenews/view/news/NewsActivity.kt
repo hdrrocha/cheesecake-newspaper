@@ -2,11 +2,14 @@ package com.example.cheesecakenews.view.news
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Context
+import android.net.ConnectivityManager
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.view.View
 import com.example.cheesecakenews.R
+import com.example.cheesecakenews.data.NewsDBHelper
 import com.example.cheesecakenews.model.News
 import com.example.cheesecakenews.view.news.adapter.NewsAdapter
 import com.example.cheesecakenews.view_model.NewsViewModel
@@ -29,43 +32,54 @@ class NewsActivity : AppCompatActivity() {
     var layoutManager = LinearLayoutManager(this)
     var listNewsView: MutableList<News> = mutableListOf()
 
+    lateinit var newsDBHelper : NewsDBHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        newsViewModel.data.observe(this, ItemsObserver)
-        newsViewModel.fetchNews()
+        newsDBHelper = NewsDBHelper(this)
+        if (verifyAvailableNetwork(this)) {
+            newsViewModel.data.observe(this, ItemsObserver)
+            newsViewModel.fetchNews()
+        } else {
+            listNewsView = newsDBHelper.readAllNews()
+            updateAdapter(listNewsView)
+        }
+
     }
 
 
     private fun onItemsFetched(list: List<News>?) {
         if (list != null) {
+            list.forEach {
+                addNews(it)
+            }
             updateAdapter(list)
         }
+    }
+
+    fun addNews(news: News){
+        var result = newsDBHelper.insertNews(News(news.title, news.website, news.authors, news.content, news.date, news.image_url))
     }
 
     private fun updateAdapter(list: List<News>) {
         recyclerViewNews.layoutManager = layoutManager
         recyclerViewNews.setHasFixedSize(true)
-
-//        if(list.size == 0){
-//            listNewsView = list as MutableList<News>
-            adapter = NewsAdapter({ news: News -> partItemClicked(news) } )
-            adapter.update(list)
-            recyclerViewNews.adapter = adapter
-
-//        }else{
-//            listNewsView.addAll(list)
-//            adapter.notifyDataSetChanged()
-//            recyclerViewNews.adapter!!.notifyDataSetChanged()
-//
-//        }
+        adapter = NewsAdapter({ news: News -> partItemClicked(news) } )
+        adapter.update(list)
+        recyclerViewNews.adapter = adapter
         progressBar.visibility = View.GONE
     }
 
     private fun partItemClicked(news: News) {
        //TO DO
+    }
+
+    fun verifyAvailableNetwork(activity:AppCompatActivity):Boolean{
+        val connectivityManager=activity.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val networkInfo=connectivityManager.activeNetworkInfo
+        return  networkInfo!=null && networkInfo.isConnected
     }
 
 }
