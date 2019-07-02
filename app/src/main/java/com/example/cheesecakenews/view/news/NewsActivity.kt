@@ -3,6 +3,7 @@ package com.example.cheesecakenews.view.news
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
+import android.content.Intent
 import android.net.ConnectivityManager
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -11,11 +12,13 @@ import android.view.View
 import com.example.cheesecakenews.R
 import com.example.cheesecakenews.data.NewsDBHelper
 import com.example.cheesecakenews.model.News
+import com.example.cheesecakenews.view.NewsNotice.NewsNoticeActivity
 import com.example.cheesecakenews.view.news.adapter.NewsAdapter
 import com.example.cheesecakenews.view_model.NewsViewModel
 import com.example.cheesecakenews.view_model.ViewModelFactory
 import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.activity_main.*
+import java.io.Serializable
 import javax.inject.Inject
 
 class NewsActivity : AppCompatActivity() {
@@ -46,7 +49,6 @@ class NewsActivity : AppCompatActivity() {
             listNewsView = newsDBHelper.readAllNews()
             updateAdapter(listNewsView)
         }
-
     }
 
 
@@ -73,7 +75,9 @@ class NewsActivity : AppCompatActivity() {
     }
 
     private fun partItemClicked(news: News) {
-       //TO DO
+        val intent = Intent(this.baseContext, NewsNoticeActivity::class.java)
+        intent.putExtra("notice", news as Serializable)
+        startActivity(intent)
     }
 
     fun verifyAvailableNetwork(activity:AppCompatActivity):Boolean{
@@ -81,5 +85,4 @@ class NewsActivity : AppCompatActivity() {
         val networkInfo=connectivityManager.activeNetworkInfo
         return  networkInfo!=null && networkInfo.isConnected
     }
-
 }

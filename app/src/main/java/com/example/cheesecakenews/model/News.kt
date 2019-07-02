@@ -1,6 +1,7 @@
 package com.example.cheesecakenews.model
 
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
 data class News (
     val title: String,
@@ -9,4 +10,4 @@ data class News (
     val date: String,
     val content: String,
     val image_url: String
-)
+) :Serializable
