@@ -10,8 +10,12 @@ import com.example.cheesecakenews.model.News
 import kotlinx.android.synthetic.main.news_item.view.*
 
 
-class NewsAdapter(var newsItens: List<News>, val clickListener: ((News) -> Unit)?) : RecyclerView.Adapter<NewsAdapter.ViewHolder>() {
+class NewsAdapter(val clickListener: ((News) -> Unit)?) : RecyclerView.Adapter<NewsAdapter.ViewHolder>() {
+    var newsItens: List<News>
 
+    init {
+        newsItens = listOf()
+    }
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(newsItem: News, clickListener: ((News) -> Unit)?) {
             itemView.textViewTitle.text = newsItem.title
@@ -36,5 +40,15 @@ class NewsAdapter(var newsItens: List<News>, val clickListener: ((News) -> Unit)
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int){
         (holder as ViewHolder).bind(newsItens[position], clickListener)
+    }
+
+    fun updateList() {
+        notifyDataSetChanged()
+    }
+
+    fun update(newsItens: List<News>) {
+        this.newsItens = emptyList()
+        this.newsItens = newsItens
+        updateList()
     }
 }

@@ -2,14 +2,12 @@ package com.example.cheesecakenews.view.news
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
-import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.view.View
 import com.example.cheesecakenews.R
 import com.example.cheesecakenews.model.News
-import com.example.cheesecakenews.model.Response
 import com.example.cheesecakenews.view.news.adapter.NewsAdapter
 import com.example.cheesecakenews.view_model.NewsViewModel
 import com.example.cheesecakenews.view_model.ViewModelFactory
@@ -37,7 +35,7 @@ class NewsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         newsViewModel.data.observe(this, ItemsObserver)
-        newsViewModel.getNews()
+        newsViewModel.fetchNews()
     }
 
 
@@ -51,17 +49,18 @@ class NewsActivity : AppCompatActivity() {
         recyclerViewNews.layoutManager = layoutManager
         recyclerViewNews.setHasFixedSize(true)
 
-        if(listNewsView.size == 0){
-            listNewsView = list as MutableList<News>
-            adapter = NewsAdapter(listNewsView, { news: News -> partItemClicked(news) } )
+//        if(list.size == 0){
+//            listNewsView = list as MutableList<News>
+            adapter = NewsAdapter({ news: News -> partItemClicked(news) } )
+            adapter.update(list)
             recyclerViewNews.adapter = adapter
 
-        }else{
-            listNewsView.addAll(list)
-            adapter.notifyDataSetChanged()
-            recyclerViewNews.adapter!!.notifyDataSetChanged()
-
-        }
+//        }else{
+//            listNewsView.addAll(list)
+//            adapter.notifyDataSetChanged()
+//            recyclerViewNews.adapter!!.notifyDataSetChanged()
+//
+//        }
         progressBar.visibility = View.GONE
     }
 

@@ -18,14 +18,13 @@ class NewsViewModel @Inject constructor(val api: ApiClient, private val schedule
     val data: LiveData<List<News>> = _data
 
 
-    fun getNews() {
+    fun fetchNews() {
         api.news().subscribeOn(schedulers.io())
             .observeOn(schedulers.mainThread())
             .subscribe({
-                Log.i("Helder", it.first().title)
                 _data.value = it
             }, {
-                Log.i("ERROR", it.message)
+                Log.e("ERROR", it.message)
             })
     }
 }
