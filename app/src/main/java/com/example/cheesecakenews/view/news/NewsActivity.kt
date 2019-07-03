@@ -19,6 +19,7 @@ import com.example.cheesecakenews.view_model.ViewModelFactory
 import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.Serializable
+import java.util.*
 import javax.inject.Inject
 
 class NewsActivity : AppCompatActivity() {
@@ -39,8 +40,9 @@ class NewsActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        listNewsView = newsDBHelper.readAllNews()
-        updateAdapter(listNewsView)
+        listNewsView = newsDBHelper.readSortItem()
+
+        updateAdapter(sorListDate(listNewsView))
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
@@ -61,7 +63,7 @@ class NewsActivity : AppCompatActivity() {
             list.forEach {
                 addNews(it)
             }
-            listNewsView = newsDBHelper.readAllNews()
+            listNewsView = newsDBHelper.readSortItem()
             updateAdapter(listNewsView)
         }
     }
@@ -86,6 +88,19 @@ class NewsActivity : AppCompatActivity() {
         intent.putExtra("notice", news as Serializable)
         newsDBHelper.readItem(news)
         startActivity(intent)
+    }
+
+
+    private fun sorListAuthor(originalItems: MutableList<News>): List<News> {
+        return originalItems.sortedWith(compareBy(News::authors))
+    }
+
+    private fun sorListTitle(originalItems: MutableList<News>): List<News> {
+        return originalItems.sortedWith(compareBy(News::title))
+    }
+
+    private fun sorListDate(originalItems: MutableList<News>): List<News> {
+        return originalItems.sortedWith(compareBy(News::date))
     }
 
 }
