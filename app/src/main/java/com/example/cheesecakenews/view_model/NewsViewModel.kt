@@ -24,6 +24,7 @@ class NewsViewModel @Inject constructor(val api: ApiClient, private val schedule
             .subscribe({
                 _data.value = it
             }, {
+                _data.value = emptyList()
                 Log.e("ERROR", it.message)
             })
     }

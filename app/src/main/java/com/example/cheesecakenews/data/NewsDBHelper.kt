@@ -40,7 +40,7 @@ class NewsDBHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, 
         values.put(DBContract.NewsEntry.COLUMN_CONTENT, news.content)
         values.put(DBContract.NewsEntry.COLUMN_DATE, news.date)
         values.put(DBContract.NewsEntry.COLUMN_IMAGE_URL, news.image_url)
-        values.put(DBContract.NewsEntry.COLUMN_IS_READ, "n")
+        values.put(DBContract.NewsEntry.COLUMN_IS_READ, news.is_read)
 
         val newRowId = db.insert(DBContract.NewsEntry.TABLE_NAME, null, values)
 
@@ -112,8 +112,7 @@ class NewsDBHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, 
         var image_url: String
         var is_read: String
 
-        if (cursor!!.moveToFirst()) {
-            while (cursor.isAfterLast == false) {
+            while (cursor.moveToNext()) {
                 title = cursor.getString(cursor.getColumnIndex(DBContract.NewsEntry.COLUMN_TITLE))
                 website = cursor.getString(cursor.getColumnIndex(DBContract.NewsEntry.COLUMN_WEBSITE))
                 authors = cursor.getString(cursor.getColumnIndex(DBContract.NewsEntry.COLUMN_AUTHORS))
@@ -121,10 +120,7 @@ class NewsDBHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, 
                 content = cursor.getString(cursor.getColumnIndex(DBContract.NewsEntry.COLUMN_CONTENT))
                 image_url = cursor.getString(cursor.getColumnIndex(DBContract.NewsEntry.COLUMN_IMAGE_URL))
                 is_read = cursor.getString(cursor.getColumnIndex(DBContract.NewsEntry.COLUMN_IS_READ))
-
                 news.add(News(title, website, authors, date, content, image_url, is_read))
-                cursor.moveToNext()
-            }
         }
         return news
     }
@@ -161,9 +157,6 @@ class NewsDBHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, 
       db.update(DBContract.NewsEntry.TABLE_NAME, values, DBContract.NewsEntry.COLUMN_TITLE + " = ?",
             arrayOf(news.title)
         )
-
-//        val newRowId = db.insert(DBContract.NewsEntry.TABLE_NAME, null, values)
-//        db.execSQL(strSQL)
         return true
     }
 

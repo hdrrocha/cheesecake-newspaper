@@ -1,6 +1,9 @@
 package com.example.cheesecakenews.view.news.adapter
 
+import android.graphics.Color
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,13 +15,16 @@ import kotlinx.android.synthetic.main.news_item.view.*
 
 class NewsAdapter(val clickListener: ((News) -> Unit)?) : RecyclerView.Adapter<NewsAdapter.ViewHolder>() {
     var newsItens: List<News>
-
     init {
         newsItens = listOf()
     }
+
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+
         fun bind(newsItem: News, clickListener: ((News) -> Unit)?) {
             itemView.textViewTitle.text = newsItem.title
+            if(newsItem.is_read.equals("r"))
+               itemView.imageViewIsRead.setImageResource(R.drawable.ic_drafts)
             itemView.textViewAuthors.text = newsItem.authors
             itemView.textViewDate.text = newsItem.date
             itemView.setOnClickListener {
@@ -26,6 +32,9 @@ class NewsAdapter(val clickListener: ((News) -> Unit)?) : RecyclerView.Adapter<N
                     clickListener(newsItem)
                 }
             }
+//            itemView.imageViewIsRead.setOnClickListener {
+//                newsItem.is_read = "r"
+//            }
             Glide.with(itemView)
                 .load("${newsItem?.image_url}")
                 .into(itemView.imageViewThumb)

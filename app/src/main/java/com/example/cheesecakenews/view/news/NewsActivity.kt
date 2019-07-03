@@ -37,17 +37,21 @@ class NewsActivity : AppCompatActivity() {
 
     lateinit var newsDBHelper : NewsDBHelper
 
+    override fun onResume() {
+        super.onResume()
+        listNewsView = newsDBHelper.readAllNews()
+        updateAdapter(listNewsView)
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
         newsDBHelper = NewsDBHelper(this)
-        if (verifyAvailableNetwork(this)) {
+        listNewsView = newsDBHelper.readAllNews()
+        if (listNewsView.isEmpty()) {
             newsViewModel.data.observe(this, ItemsObserver)
             newsViewModel.fetchNews()
-        } else {
-            listNewsView = newsDBHelper.readAllNews()
-            updateAdapter(listNewsView)
         }
     }
 
@@ -57,12 +61,14 @@ class NewsActivity : AppCompatActivity() {
             list.forEach {
                 addNews(it)
             }
-            updateAdapter(list)
+            listNewsView = newsDBHelper.readAllNews()
+            updateAdapter(listNewsView)
         }
     }
 
     fun addNews(news: News){
-        var result = newsDBHelper.insertNews(News(news.title, news.website, news.authors, news.content, news.date, news.image_url, news.is_read))
+        news.is_read = "n"
+        newsDBHelper.insertNews(news)
     }
 
     private fun updateAdapter(list: List<News>) {
@@ -75,16 +81,11 @@ class NewsActivity : AppCompatActivity() {
     }
 
     private fun partItemClicked(news: News) {
+        news.is_read = "r"
         val intent = Intent(this.baseContext, NewsNoticeActivity::class.java)
         intent.putExtra("notice", news as Serializable)
-        news.is_read = "r"
         newsDBHelper.readItem(news)
         startActivity(intent)
     }
 
-    fun verifyAvailableNetwork(activity:AppCompatActivity):Boolean{
-        val connectivityManager=activity.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val networkInfo=connectivityManager.activeNetworkInfo
-        return  networkInfo!=null && networkInfo.isConnected
-    }
 }
