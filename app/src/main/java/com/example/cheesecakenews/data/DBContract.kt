@@ -12,6 +12,7 @@ object DBContract {
             val COLUMN_DATE = "date"
             val COLUMN_CONTENT = "content"
             val COLUMN_IMAGE_URL = "image_url"
+            val COLUMN_IS_READ = "is_read"
         }
     }
 }

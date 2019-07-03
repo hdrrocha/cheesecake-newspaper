@@ -7,7 +7,11 @@ import android.database.sqlite.SQLiteConstraintException
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteException
 import android.database.sqlite.SQLiteOpenHelper
+import android.support.v7.widget.DialogTitle
 import com.example.cheesecakenews.model.News
+import android.provider.SyncStateContract.Helpers.update
+
+
 
 
 class NewsDBHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
@@ -36,6 +40,7 @@ class NewsDBHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, 
         values.put(DBContract.NewsEntry.COLUMN_CONTENT, news.content)
         values.put(DBContract.NewsEntry.COLUMN_DATE, news.date)
         values.put(DBContract.NewsEntry.COLUMN_IMAGE_URL, news.image_url)
+        values.put(DBContract.NewsEntry.COLUMN_IS_READ, "n")
 
         val newRowId = db.insert(DBContract.NewsEntry.TABLE_NAME, null, values)
 
@@ -69,6 +74,7 @@ class NewsDBHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, 
         var date: String
         var content: String
         var image_url: String
+        var is_read: String
 
         if (cursor!!.moveToFirst()) {
             while (cursor.isAfterLast == false) {
@@ -78,8 +84,9 @@ class NewsDBHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, 
                 date = cursor.getString(cursor.getColumnIndex(DBContract.NewsEntry.COLUMN_DATE))
                 content = cursor.getString(cursor.getColumnIndex(DBContract.NewsEntry.COLUMN_CONTENT))
                 image_url = cursor.getString(cursor.getColumnIndex(DBContract.NewsEntry.COLUMN_IMAGE_URL))
+                is_read = cursor.getString(cursor.getColumnIndex(DBContract.NewsEntry.COLUMN_IS_READ))
 
-                news.add(News(title, website, authors, date, content, image_url))
+                news.add(News(title, website, authors, date, content, image_url, is_read))
                 cursor.moveToNext()
             }
         }
@@ -103,6 +110,7 @@ class NewsDBHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, 
         var date: String
         var content: String
         var image_url: String
+        var is_read: String
 
         if (cursor!!.moveToFirst()) {
             while (cursor.isAfterLast == false) {
@@ -112,8 +120,9 @@ class NewsDBHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, 
                 date = cursor.getString(cursor.getColumnIndex(DBContract.NewsEntry.COLUMN_DATE))
                 content = cursor.getString(cursor.getColumnIndex(DBContract.NewsEntry.COLUMN_CONTENT))
                 image_url = cursor.getString(cursor.getColumnIndex(DBContract.NewsEntry.COLUMN_IMAGE_URL))
+                is_read = cursor.getString(cursor.getColumnIndex(DBContract.NewsEntry.COLUMN_IS_READ))
 
-                news.add(News(title, website, authors, date, content, image_url))
+                news.add(News(title, website, authors, date, content, image_url, is_read))
                 cursor.moveToNext()
             }
         }
@@ -131,9 +140,31 @@ class NewsDBHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, 
                     DBContract.NewsEntry.COLUMN_WEBSITE + " TEXT," +
                     DBContract.NewsEntry.COLUMN_CONTENT + " TEXT," +
                     DBContract.NewsEntry.COLUMN_DATE + " TEXT," +
-                    DBContract.NewsEntry.COLUMN_IMAGE_URL + " TEXT)"
+                    DBContract.NewsEntry.COLUMN_IMAGE_URL + " TEXT,"+
+                    DBContract.NewsEntry.COLUMN_IS_READ + " TEXT)"
 
         private val SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS " + DBContract.NewsEntry.TABLE_NAME
+    }
+
+    @Throws(SQLiteConstraintException::class)
+    fun readItem(news: News): Boolean {
+        val db = writableDatabase
+        val values = ContentValues()
+        values.put(DBContract.NewsEntry.COLUMN_TITLE, news.title)
+        values.put(DBContract.NewsEntry.COLUMN_WEBSITE, news.website)
+        values.put(DBContract.NewsEntry.COLUMN_AUTHORS, news.authors)
+        values.put(DBContract.NewsEntry.COLUMN_CONTENT, news.content)
+        values.put(DBContract.NewsEntry.COLUMN_DATE, news.date)
+        values.put(DBContract.NewsEntry.COLUMN_IMAGE_URL, news.image_url)
+        values.put(DBContract.NewsEntry.COLUMN_IS_READ, news.is_read)
+
+      db.update(DBContract.NewsEntry.TABLE_NAME, values, DBContract.NewsEntry.COLUMN_TITLE + " = ?",
+            arrayOf(news.title)
+        )
+
+//        val newRowId = db.insert(DBContract.NewsEntry.TABLE_NAME, null, values)
+//        db.execSQL(strSQL)
+        return true
     }
 
 }

@@ -62,7 +62,7 @@ class NewsActivity : AppCompatActivity() {
     }
 
     fun addNews(news: News){
-        var result = newsDBHelper.insertNews(News(news.title, news.website, news.authors, news.content, news.date, news.image_url))
+        var result = newsDBHelper.insertNews(News(news.title, news.website, news.authors, news.content, news.date, news.image_url, news.is_read))
     }
 
     private fun updateAdapter(list: List<News>) {
@@ -77,6 +77,8 @@ class NewsActivity : AppCompatActivity() {
     private fun partItemClicked(news: News) {
         val intent = Intent(this.baseContext, NewsNoticeActivity::class.java)
         intent.putExtra("notice", news as Serializable)
+        news.is_read = "r"
+        newsDBHelper.readItem(news)
         startActivity(intent)
     }
 
