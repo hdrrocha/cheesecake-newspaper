@@ -7,7 +7,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Singleton
 
-
 interface SchedulerProvider {
     fun mainThread(): Scheduler
     fun io(): Scheduler

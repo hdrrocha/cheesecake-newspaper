@@ -4,47 +4,61 @@ import android.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.cheesecakenews.SchedulerProvider
 import com.example.cheesecakenews.api.ApiClient
 import com.example.cheesecakenews.model.News
-import io.kotlintest.specs.Test
 import io.reactivex.Observable
+import io.reactivex.Scheduler
+import io.reactivex.schedulers.Schedulers
+import org.junit.Assert.assertEquals
 import org.junit.Before
-
 import org.junit.Rule
+import org.junit.Test
 import org.mockito.Mock
-import org.mockito.Mockito
-import org.mockito.Mockito.*
+import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
 
-
 class NewsViewModelTest {
-
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
     @Mock
-    lateinit var apiClient: ApiClient
+    private lateinit var apiClient: ApiClient
 
-    @Mock
-    lateinit var schedulerProvider: SchedulerProvider
+    private val schedulerProvider: SchedulerProvider =
+        object : SchedulerProvider {
+            override fun mainThread(): Scheduler = Schedulers.trampoline()
+            override fun io(): Scheduler = Schedulers.trampoline()
+        }
 
-    lateinit var mainViewModel: NewsViewModel
+    private lateinit var mainViewModel: NewsViewModel
 
     @Before
     fun setUp() {
         MockitoAnnotations.initMocks(this)
-        this.mainViewModel = NewsViewModel(this.apiClient, this.schedulerProvider)
+        mainViewModel = NewsViewModel(apiClient, schedulerProvider)
     }
 
     @Test
-    fun wheneverFetchSuccessWithDataShouldResultSuccessWithData() {
+    fun `whenever fetch success with data it should result success with data`() {
         // Given
-        val data = News("title", "website", "authors", "date","content", "image_url", "r")
-        val observable = Observable.just(data)
+        val data = News("title", "website", "authors", "date", "content", "image_url", "r")
+        `when`(apiClient.news()).thenReturn(Observable.just(listOf(data)))
 
         // When
-        Mockito.`when`(mainViewModel.fetchNews()).thenAnswer(null)
+        mainViewModel.fetchNews()
 
         // Then
-        verify(observable, null)
+        assertEquals(listOf(data), mainViewModel.data.value)
+    }
+
+    @Test
+    fun `whenever fetch fails it should result in no data`() {
+        // Given
+        `when`(apiClient.news()).thenReturn(Observable.error(Exception("dummyError")))
+
+        // When
+        mainViewModel.fetchNews()
+
+        // Then
+        assertEquals(emptyList<News>(), mainViewModel.data.value)
     }
 }
 

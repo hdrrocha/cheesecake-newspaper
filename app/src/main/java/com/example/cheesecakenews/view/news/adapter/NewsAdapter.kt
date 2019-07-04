@@ -1,9 +1,6 @@
 package com.example.cheesecakenews.view.news.adapter
 
-import android.graphics.Color
-import android.support.v4.content.ContextCompat
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,11 +9,10 @@ import com.example.cheesecakenews.R
 import com.example.cheesecakenews.model.News
 import kotlinx.android.synthetic.main.news_item.view.*
 
-
 class NewsAdapter(val clickListener: ((News) -> Unit)?) : RecyclerView.Adapter<NewsAdapter.ViewHolder>() {
-    var newsItens: List<News>
+    var newsItems: List<News>
     init {
-        newsItens = listOf()
+        newsItems = listOf()
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -43,19 +39,19 @@ class NewsAdapter(val clickListener: ((News) -> Unit)?) : RecyclerView.Adapter<N
         return ViewHolder(view)
     }
 
-    override fun getItemCount() = newsItens.size
+    override fun getItemCount() = newsItems.size
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int){
-        (holder as ViewHolder).bind(newsItens[position], clickListener)
+        (holder as ViewHolder).bind(newsItems[position], clickListener)
     }
 
     fun updateList() {
         notifyDataSetChanged()
     }
 
-    fun update(newsItens: List<News>) {
-        this.newsItens = emptyList()
-        this.newsItens = newsItens
+    fun update(newsItems: List<News>) {
+        this.newsItems = emptyList()
+        this.newsItems = newsItems
         updateList()
     }
 }

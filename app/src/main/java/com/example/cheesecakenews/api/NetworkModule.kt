@@ -13,10 +13,9 @@ import javax.inject.Singleton
 class NetworkModule {
     @Provides
     @Singleton
-    fun providesGitApi(): ApiClient {
+    fun providesApi(): ApiClient {
 
         val gson = GsonBuilder()
-            .setLenient()
             .create()
 
         val gitApi = Retrofit.Builder()

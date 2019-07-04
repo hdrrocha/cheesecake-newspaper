@@ -2,9 +2,7 @@ package com.example.cheesecakenews.view.news
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
-import android.content.Context
 import android.content.Intent
-import android.net.ConnectivityManager
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
@@ -12,24 +10,16 @@ import android.view.View
 import com.example.cheesecakenews.R
 import com.example.cheesecakenews.data.NewsDBHelper
 import com.example.cheesecakenews.model.News
-import com.example.cheesecakenews.view.NewsNotice.NewsNoticeActivity
+import com.example.cheesecakenews.view.news_item.NewsItemActivity
 import com.example.cheesecakenews.view.news.adapter.NewsAdapter
 import com.example.cheesecakenews.view_model.NewsViewModel
 import com.example.cheesecakenews.view_model.ViewModelFactory
 import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.Serializable
-import java.util.*
 import javax.inject.Inject
-import android.view.animation.AccelerateDecelerateInterpolator
-import android.view.Gravity
-import android.transition.Slide
-import android.os.Build
-import android.app.ActivityOptions
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
-
 
 class NewsActivity : AppCompatActivity() {
     @Inject
@@ -50,14 +40,13 @@ class NewsActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         listNewsView = newsDBHelper.readSortItem()
-
         updateAdapter(listNewsView)
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
 
         newsDBHelper = NewsDBHelper(this)
         listNewsView = newsDBHelper.readAllNews()
@@ -69,12 +58,12 @@ class NewsActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         val inflater = menuInflater
-        inflater.inflate(R.menu.my_menu, menu)
+        inflater.inflate(R.menu.list_menu, menu)
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
-        R.id.action_search -> {
+        R.id.action_first -> {
             true
         }
         R.id.action_author -> {
@@ -119,15 +108,11 @@ class NewsActivity : AppCompatActivity() {
     }
 
     private fun partItemClicked(news: News) {
-        news.is_read = "r"
-        val intent = Intent(this.baseContext, NewsNoticeActivity::class.java)
+        val intent = Intent(this.baseContext, NewsItemActivity::class.java)
         intent.putExtra("notice", news as Serializable)
-        newsDBHelper.readItem(news)
         startActivity(intent)
         overridePendingTransition(R.anim.bottom_up, R.anim.nothing);
-
     }
-
 
     private fun sorListAuthor(originalItems: MutableList<News>): List<News> {
         return originalItems.sortedWith(compareBy(News::authors))
@@ -140,5 +125,4 @@ class NewsActivity : AppCompatActivity() {
     private fun sorListDate(originalItems: MutableList<News>): List<News> {
         return originalItems.sortedWith(compareBy(News::date))
     }
-
 }

@@ -11,10 +11,9 @@ import android.support.v7.widget.DialogTitle
 import com.example.cheesecakenews.model.News
 import android.provider.SyncStateContract.Helpers.update
 
-
-
-
 class NewsDBHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
+    private fun Cursor.getString(column: String): String = getString(getColumnIndex(column))
+
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL(SQL_CREATE_ENTRIES)
     }
@@ -29,22 +28,19 @@ class NewsDBHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, 
     }
 
     @Throws(SQLiteConstraintException::class)
-    fun insertNews(news: News): Boolean {
-
-        val db = writableDatabase
-
-        val values = ContentValues()
-        values.put(DBContract.NewsEntry.COLUMN_TITLE, news.title)
-        values.put(DBContract.NewsEntry.COLUMN_WEBSITE, news.website)
-        values.put(DBContract.NewsEntry.COLUMN_AUTHORS, news.authors)
-        values.put(DBContract.NewsEntry.COLUMN_CONTENT, news.content)
-        values.put(DBContract.NewsEntry.COLUMN_DATE, news.date)
-        values.put(DBContract.NewsEntry.COLUMN_IMAGE_URL, news.image_url)
-        values.put(DBContract.NewsEntry.COLUMN_IS_READ, news.is_read)
-
+    fun insertNews(news: News): Boolean = writableDatabase.use { db ->
+        val values = ContentValues().apply {
+            put(DBContract.NewsEntry.COLUMN_TITLE, news.title)
+            put(DBContract.NewsEntry.COLUMN_WEBSITE, news.website)
+            put(DBContract.NewsEntry.COLUMN_AUTHORS, news.authors)
+            put(DBContract.NewsEntry.COLUMN_CONTENT, news.content)
+            put(DBContract.NewsEntry.COLUMN_DATE, news.date)
+            put(DBContract.NewsEntry.COLUMN_IMAGE_URL, news.image_url)
+            put(DBContract.NewsEntry.COLUMN_IS_READ, news.is_read)
+        }
         val newRowId = db.insert(DBContract.NewsEntry.TABLE_NAME, null, values)
 
-        return true
+        newRowId > -1
     }
 
     @Throws(SQLiteConstraintException::class)
@@ -57,44 +53,39 @@ class NewsDBHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, 
         return true
     }
 
-    fun readNews(newsTitle: String): ArrayList<News> {
-        val news = ArrayList<News>()
-        val db = writableDatabase
-        var cursor: Cursor? = null
-        try {
-            val selectQuery = "SELECT  * FROM " + DBContract.NewsEntry.TABLE_NAME + "WHERE " +
-                    DBContract.NewsEntry.COLUMN_TITLE +  newsTitle
+    fun readNews(newsTitle: String): ArrayList<News> =
+        writableDatabase.use { db ->
+            val selectQuery =
+                "SELECT  * FROM ${DBContract.NewsEntry.TABLE_NAME} WHERE ${DBContract.NewsEntry.COLUMN_TITLE} = $newsTitle"
+            db.rawQuery(selectQuery, null).use { cursor ->
+                val news = ArrayList<News>()
+                if (cursor.moveToFirst()) {
+                    while (!cursor.isAfterLast) {
+                        val title = cursor.getString(DBContract.NewsEntry.COLUMN_TITLE)
+                        val website = cursor.getString(DBContract.NewsEntry.COLUMN_WEBSITE)
+                        val authors = cursor.getString(DBContract.NewsEntry.COLUMN_AUTHORS)
+                        val date = cursor.getString(DBContract.NewsEntry.COLUMN_DATE)
+                        val content = cursor.getString(DBContract.NewsEntry.COLUMN_CONTENT)
+                        val image_url = cursor.getString(DBContract.NewsEntry.COLUMN_IMAGE_URL)
+                        val is_read = cursor.getString(DBContract.NewsEntry.COLUMN_IS_READ)
 
-            cursor = db.rawQuery(selectQuery, null)
-        } catch (e: SQLiteException) {
-            db.execSQL(SQL_CREATE_ENTRIES)
-            return ArrayList()
-        }
-
-        var title: String
-        var website: String
-        var authors: String
-        var date: String
-        var content: String
-        var image_url: String
-        var is_read: String
-
-        if (cursor!!.moveToFirst()) {
-            while (cursor.isAfterLast == false) {
-                title = cursor.getString(cursor.getColumnIndex(DBContract.NewsEntry.COLUMN_TITLE))
-                website = cursor.getString(cursor.getColumnIndex(DBContract.NewsEntry.COLUMN_WEBSITE))
-                authors = cursor.getString(cursor.getColumnIndex(DBContract.NewsEntry.COLUMN_AUTHORS))
-                date = cursor.getString(cursor.getColumnIndex(DBContract.NewsEntry.COLUMN_DATE))
-                content = cursor.getString(cursor.getColumnIndex(DBContract.NewsEntry.COLUMN_CONTENT))
-                image_url = cursor.getString(cursor.getColumnIndex(DBContract.NewsEntry.COLUMN_IMAGE_URL))
-                is_read = cursor.getString(cursor.getColumnIndex(DBContract.NewsEntry.COLUMN_IS_READ))
-
-                news.add(News(title, website, authors, date, content, image_url, is_read))
-                cursor.moveToNext()
+                        news.add(
+                            News(
+                                title,
+                                website,
+                                authors,
+                                date,
+                                content,
+                                image_url,
+                                is_read
+                            )
+                        )
+                        cursor.moveToNext()
+                    }
+                }
+                news
             }
         }
-        return news
-    }
 
     fun readAllNews(): ArrayList<News> {
         val news = ArrayList<News>()
@@ -162,6 +153,7 @@ class NewsDBHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, 
         )
         return true
     }
+
     @Throws(SQLiteConstraintException::class)
     fun readSortItem(): ArrayList<News> {
         val news = ArrayList<News>()
@@ -195,7 +187,6 @@ class NewsDBHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, 
             news.add(News(title, website, authors, date, content, image_url, is_read))
         }
         return news
-
     }
 
 }
