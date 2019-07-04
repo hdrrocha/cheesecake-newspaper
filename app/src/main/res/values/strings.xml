@@ -1,3 +1,8 @@
 <resources>
-    <string name="app_name">cheesecakeNews</string>
+    <string name="app_name">News</string>
+    <string name="author">Autor</string>
+    <string name="date">Data</string>
+    <string name="title">Título</string>
+    <string name="mark_read">Marcar como lida</string>
+    <string name="mark_unread">Marcar como não lida</string>
 </resources>
