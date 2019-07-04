@@ -24,4 +24,10 @@ class NewsNoticeActivity : AppCompatActivity() {
             .into(imageViewNewsThumb)
         textViewNewsContent.text = newsNotice?.content
     }
+
+    override fun finish() {
+        super.finish()
+        overridePendingTransition(R.anim.no_animation, R.anim.slide_down);
+
+    }
 }

@@ -21,6 +21,15 @@ import kotlinx.android.synthetic.main.activity_main.*
 import java.io.Serializable
 import java.util.*
 import javax.inject.Inject
+import android.view.animation.AccelerateDecelerateInterpolator
+import android.view.Gravity
+import android.transition.Slide
+import android.os.Build
+import android.app.ActivityOptions
+import android.view.Menu
+import android.view.MenuItem
+import android.widget.Toast
+
 
 class NewsActivity : AppCompatActivity() {
     @Inject
@@ -42,12 +51,13 @@ class NewsActivity : AppCompatActivity() {
         super.onResume()
         listNewsView = newsDBHelper.readSortItem()
 
-        updateAdapter(sorListDate(listNewsView))
+        updateAdapter(listNewsView)
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
 
         newsDBHelper = NewsDBHelper(this)
         listNewsView = newsDBHelper.readAllNews()
@@ -57,6 +67,32 @@ class NewsActivity : AppCompatActivity() {
         }
     }
 
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        val inflater = menuInflater
+        inflater.inflate(R.menu.my_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+        R.id.action_search -> {
+            true
+        }
+        R.id.action_author -> {
+            updateAdapter(sorListAuthor(listNewsView))
+            true
+        }
+        R.id.action_title -> {
+            updateAdapter(sorListTitle(listNewsView))
+            true
+        }
+        R.id.action_date -> {
+            updateAdapter(sorListDate(listNewsView))
+            true
+        }
+        else -> {
+            super.onOptionsItemSelected(item)
+        }
+    }
 
     private fun onItemsFetched(list: List<News>?) {
         if (list != null) {
@@ -88,6 +124,7 @@ class NewsActivity : AppCompatActivity() {
         intent.putExtra("notice", news as Serializable)
         newsDBHelper.readItem(news)
         startActivity(intent)
+        overridePendingTransition(R.anim.slide_up,  R.anim.no_animation);
     }
 
 
