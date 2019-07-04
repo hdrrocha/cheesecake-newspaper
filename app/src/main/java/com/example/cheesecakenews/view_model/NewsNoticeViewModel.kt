@@ -21,6 +21,6 @@ class NewsNoticeViewModel @Inject constructor(val api: ApiClient, private val sc
 
     fun fetchNewsNotice(title: String, context: Context ) {
         newsDBHelper = NewsDBHelper(context)
-//        _data.value = newsDBHelper.readNews(title)
+        _data.value = newsDBHelper.readNews(title)
     }
 }

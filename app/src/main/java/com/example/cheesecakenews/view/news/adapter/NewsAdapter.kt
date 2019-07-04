@@ -32,9 +32,6 @@ class NewsAdapter(val clickListener: ((News) -> Unit)?) : RecyclerView.Adapter<N
                     clickListener(newsItem)
                 }
             }
-//            itemView.imageViewIsRead.setOnClickListener {
-//                newsItem.is_read = "r"
-//            }
             Glide.with(itemView)
                 .load("${newsItem?.image_url}")
                 .into(itemView.imageViewThumb)

@@ -34,20 +34,17 @@ class NewsViewModelTest {
         this.mainViewModel = NewsViewModel(this.apiClient, this.schedulerProvider)
     }
 
-
     @Test
     fun wheneverFetchSuccessWithDataShouldResultSuccessWithData() {
         // Given
-        val data = News("title", "website", "authors", "date","content", "image_url")
+        val data = News("title", "website", "authors", "date","content", "image_url", "r")
         val observable = Observable.just(data)
 
         // When
         Mockito.`when`(mainViewModel.fetchNews()).thenAnswer(null)
 
-
         // Then
         verify(observable, null)
-
     }
 }
 

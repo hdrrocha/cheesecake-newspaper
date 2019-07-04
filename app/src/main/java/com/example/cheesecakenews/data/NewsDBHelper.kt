@@ -62,7 +62,10 @@ class NewsDBHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, 
         val db = writableDatabase
         var cursor: Cursor? = null
         try {
-            cursor = db.rawQuery("select * from " + DBContract.NewsEntry.TABLE_NAME + " WHERE " + DBContract.NewsEntry.COLUMN_TITLE + "='" + newsTitle + "'", null)
+            val selectQuery = "SELECT  * FROM " + DBContract.NewsEntry.TABLE_NAME + "WHERE " +
+                    DBContract.NewsEntry.COLUMN_TITLE +  newsTitle
+
+            cursor = db.rawQuery(selectQuery, null)
         } catch (e: SQLiteException) {
             db.execSQL(SQL_CREATE_ENTRIES)
             return ArrayList()

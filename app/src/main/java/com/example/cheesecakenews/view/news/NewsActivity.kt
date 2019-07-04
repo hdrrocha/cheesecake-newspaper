@@ -124,7 +124,8 @@ class NewsActivity : AppCompatActivity() {
         intent.putExtra("notice", news as Serializable)
         newsDBHelper.readItem(news)
         startActivity(intent)
-        overridePendingTransition(R.anim.slide_up,  R.anim.no_animation);
+        overridePendingTransition(R.anim.bottom_up, R.anim.nothing);
+
     }
 
 

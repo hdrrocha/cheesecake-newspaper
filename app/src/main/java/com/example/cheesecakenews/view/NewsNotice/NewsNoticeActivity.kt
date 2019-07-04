@@ -11,13 +11,20 @@ import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.activity_news_notice.*
 
 class NewsNoticeActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_news_notice)
+        showNotice( createNews(getIntent().getExtras()))
+    }
 
-        val newsNotice = getIntent().getExtras().getSerializable("notice") as? News
+    fun createNews(extras: Bundle?): News? {
+        return  extras?.getSerializable("notice") as? News
+    }
 
+
+    fun showNotice(newsNotice: News?) {
         textViewNewsTitle.text = newsNotice?.title
         Glide.with(this)
             .load("${newsNotice?.image_url}")
@@ -25,9 +32,8 @@ class NewsNoticeActivity : AppCompatActivity() {
         textViewNewsContent.text = newsNotice?.content
     }
 
-    override fun finish() {
-        super.finish()
-        overridePendingTransition(R.anim.no_animation, R.anim.slide_down);
-
+    override fun onBackPressed() {
+        super.onBackPressed()
+        overridePendingTransition(R.anim.nothing, R.anim.bottom_down)
     }
 }
